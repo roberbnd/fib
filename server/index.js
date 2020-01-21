@@ -1,7 +1,7 @@
 const keys = require('./keys')
 
 const express = require('express')
-const boyParser = require('body-parser')
+const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const app = express()
@@ -43,25 +43,25 @@ app.get('/values/all', async(req, res) => {
 })
 
 app.get('/values/current', async(req, res) => {
-    redisClient.hgetall('values', (err, value) => {
+    redisClient.hgetall('values', (err, values) => {
         res.send(values)
     })
 })
 
 app.post('/values', async (req, res) => {
- const index = req.body.index;
+  const index = req.body.index;
 
   if(parseInt(index) > 40) {
     return res.status(422).send('Index too high')
   }
 
-  redisCredisClient.hset('values', index, 'Nothing yet!')
+  redisClient.hset('values', index, 'Nothing yet!')
   redisPublisher.publish('insert', index)
-  pgClient.query('insert into values(number) values($1)', [index])
+  pgClient.query('INSERT INTO values(number) values($1)', [index])
 
   res.send({ working: true })
 })
 
-app.listen(500, err => {
+app.listen(5000, err => {
   console.log('Listening')
 })
